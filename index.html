@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Together 26">
+<title>Let's Make it Together · Logicalis</title>
+<meta name="theme-color" content="#1a4adc">
+<link rel="apple-touch-icon" href="logo_1.jpg">
+<link rel="icon" type="image/jpeg" href="logo_1.jpg">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: #f4f2ee; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a2e; }
+  .app-shell { max-width: 480px; margin: 0 auto; background: #f4f2ee; min-height: 100vh; display: flex; flex-direction: column; }
+
+  .app-header { background: #1a4adc; overflow: hidden; }
+  .event-pills-bar { display: flex; gap: 8px; flex-wrap: wrap; padding: 10px 16px 14px; background: #1a4adc; }
+  .pill { font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.2); }
+  .pill.accent { background: rgba(255,255,255,0.25); color: #fff; border-color: rgba(255,255,255,0.4); font-weight: 700; }
+
+  .nav-tabs { background: #fff; display: flex; border-bottom: 1.5px solid #e8e5e0; flex-shrink: 0; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .nav-tab { flex: 1; padding: 15px 4px; font-size: 13px; font-weight: 600; color: #aaa; text-align: center; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; user-select: none; }
+  .nav-tab.active { color: #1e1060; border-bottom-color: #5b35d5; }
+
+  .tab-content { display: none; background: #f4f2ee; flex: 1; padding-bottom: 50px; }
+  .tab-content.active { display: block; }
+
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: #aaa; padding: 18px 20px 8px; }
+
+  /* TIMELINE */
+  .timeline-item { display: flex; padding: 0 16px 0 14px; margin-bottom: 2px; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; width: 58px; flex-shrink: 0; padding-top: 18px; }
+  .tl-time { font-size: 13px; font-weight: 700; color: #5b35d5; white-space: nowrap; }
+  .tl-line { width: 2px; flex: 1; background: #ddd; margin-top: 7px; min-height: 24px; border-radius: 1px; }
+  .tl-dot-wrap { display: flex; align-items: flex-start; padding-top: 18px; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: #5b35d5; flex-shrink: 0; margin-top: 4px; }
+  .tl-dot.highlight { background: #e07d20; }
+  .tl-dot.green { background: #2e9e68; }
+  .tl-card { flex: 1; background: #fff; border-radius: 14px; padding: 14px 16px; margin: 10px 0 10px 10px; border: 1px solid #e8e5e0; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .tl-card-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 5px; line-height: 1.3; }
+  .tl-card-desc { font-size: 13px; color: #555; line-height: 1.65; }
+  .tl-badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 8px; margin-top: 8px; font-weight: 700; }
+  .badge-prep { background: #ede9fb; color: #5b35d5; }
+  .badge-guests { background: #e4f5ee; color: #1e7d52; }
+  .badge-show { background: #fef3e2; color: #b85f0a; }
+  .badge-food { background: #fde8e8; color: #b02020; }
+  .badge-end { background: #f0f0f0; color: #777; }
+
+  /* Live banner */
+  .live-banner { background: #e8f8f1; border: 1.5px solid #a3dfc3; border-radius: 12px; margin: 14px 16px 4px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+  .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #2e9e68; flex-shrink: 0; animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .live-text { font-size: 13px; color: #1a6e45; font-weight: 700; flex: 1; }
+  .live-time { font-size: 13px; color: #2e9e68; font-weight: 700; }
+
+  /* EQUIPA */
+  .role-section { padding: 10px 16px; }
+  .role-card { background: #fff; border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; border: 1px solid #e8e5e0; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .role-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .role-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+  .av-purple { background: #ede9fb; color: #5b35d5; }
+  .av-teal   { background: #e4f5ee; color: #1e7d52; }
+  .av-amber  { background: #fef3e2; color: #b85f0a; }
+  .av-blue   { background: #e6f0fb; color: #1a5fa8; }
+  .av-pink   { background: #fde8f0; color: #a81a5f; }
+  .role-name { font-size: 16px; font-weight: 800; color: #1a1a2e; }
+  .role-subtitle { font-size: 12px; color: #999; margin-top: 2px; }
+
+  .role-timeline { margin-top: 12px; }
+  .rt-item { display: flex; gap: 10px; margin-bottom: 0; }
+  .rt-left { display: flex; flex-direction: column; align-items: center; width: 46px; flex-shrink: 0; }
+  .rt-time { font-size: 11px; font-weight: 700; color: #5b35d5; white-space: nowrap; padding-top: 2px; }
+  .rt-line { width: 1.5px; flex: 1; background: #e8e5e0; margin-top: 4px; min-height: 12px; }
+  .rt-dot { width: 7px; height: 7px; border-radius: 50%; background: #5b35d5; flex-shrink: 0; margin-top: 4px; }
+  .rt-dot.green { background: #2e9e68; }
+  .rt-dot.orange { background: #e07d20; }
+  .rt-content { flex: 1; padding: 0 0 12px 0; }
+  .rt-label { font-size: 13px; font-weight: 700; color: #1a1a2e; line-height: 1.3; }
+  .rt-desc { font-size: 12px; color: #666; line-height: 1.5; margin-top: 3px; }
+
+  /* INFO */
+  .info-section { padding: 10px 16px; }
+  .info-card { background: #fff; border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; border: 1px solid #e8e5e0; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+  .info-card-title { font-size: 11px; font-weight: 700; color: #bbb; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .info-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f0ede8; gap: 12px; }
+  .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .info-key { font-size: 14px; color: #888; flex-shrink: 0; }
+  .info-val { font-size: 14px; color: #1a1a2e; font-weight: 600; text-align: right; }
+  .zone-hl { position:absolute; border-radius:6px; display:none; pointer-events:none; transition:opacity 0.2s; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="app-header">
+    <img src="logo_1.jpg" alt="Let's Make it Together · Logicalis" style="width:100%;display:block;">
+    <div class="event-pills-bar">
+      <div class="pill accent">Sexta-feira · 20 Mar</div>
+      <div class="pill">160 convidados</div>
+      <div class="pill">07:00 — 00:00</div>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('agenda',this)">Agenda</div>
+    <div class="nav-tab" onclick="switchTab('equipa',this)">Equipa</div>
+    <div class="nav-tab" onclick="switchTab('info',this)">Info</div>
+    <div class="nav-tab" onclick="switchTab('mapa',this)">Mapa</div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="tab-content active" id="tab-agenda">
+    <div class="live-banner">
+      <div class="live-dot"></div>
+      <div class="live-text" id="live-text">A carregar...</div>
+      <div class="live-time" id="live-clock"></div>
+    </div>
+
+    <div class="section-title">Manhã · Montagens</div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">07:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Montagens Audiomeios</div><div class="tl-card-desc">Audiomeios + Casa do Marquês</div><div class="tl-badge badge-prep">Preparação</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">09:30</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Chegada The Stage</div><div class="tl-card-desc">Equipa chega ao local</div><div class="tl-badge badge-prep">Preparação</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">10:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Montagens e Testes Photobooth & DJ</div><div class="tl-card-desc">Entrega materiais da gráfica · Montagem photowall à frente dos biombos, bengaleiro + check-in · Centros de mesa, ementas, cartões de alimentação especial</div><div class="tl-badge badge-prep">Preparação</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">12:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Testes Cliente + Mágico</div><div class="tl-card-desc">Testes gerais com o cliente e espetáculo de magia · Audiomeios em paralelo</div><div class="tl-badge badge-prep">Preparação</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">14:30</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot highlight"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Tudo Pronto · Equipa no Local</div><div class="tl-card-desc">Promotoras e videógrafo chegam e estão prontos · Imagem genérica no LED Wall · Microfones: 2 auriculares + 3 de mão</div><div class="tl-badge badge-prep">Preparação</div></div>
+    </div>
+
+    <div class="section-title">Tarde · Receção</div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">15:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot green"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Chegada de Convidados — 160 pax</div><div class="tl-card-desc">Check-in via QR Code (app 3ricket) · Cartões de alimentação especial · Bengaleiro · Fotos no Backdrop · Encaminhar para Welcome Coffee</div><div class="tl-badge badge-guests">Convidados</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">15:30</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot green"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Welcome Coffee — 160 pax</div><div class="tl-card-desc">Encaminhar para Fotografia de Grupo</div><div class="tl-badge badge-guests">Convidados</div></div>
+    </div>
+
+    <div class="section-title">Tarde · Programa</div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">16:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Apresentação Board</div><div class="tl-card-desc">João Martins, CEO — mic auricular · Hugo Ferreira, Finance Director · Colocar apresentações do cliente no LED Wall · Encaminhar para a plateia</div><div class="tl-badge badge-show">Palco</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">17:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot green"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Coffee Break — 160 pax</div><div class="tl-card-desc">Empregado de permanência · Imagem "Coffee Break" no LED Wall · Encaminhar de volta para a plateia</div><div class="tl-badge badge-guests">Convidados</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">17:30</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Apresentação Board</div><div class="tl-card-desc">Pedro Dias, CSO · Miguel Borges, COO · Colocar apresentações do cliente no LED Wall</div><div class="tl-badge badge-show">Palco</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">18:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Q&A + Fecho da Sessão</div><div class="tl-card-desc">Distribuir microfones pela plateia · João continua com mic auricular · 1 mic de mão na fila da frente · 2 mics com as promotoras para circular · Imagem Q&A no LED Wall</div><div class="tl-badge badge-show">Palco</div></div>
+    </div>
+
+    <div class="section-title">Noite · Festa</div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">19:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot highlight"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Cocktail + Photobooth IA</div><div class="tl-card-desc">158 pax · Canapés · Música ambiente · Ativação digital Photobooth IA · Encaminhar convidados</div><div class="tl-badge badge-show">Festa</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">20:15</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot green"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Jantar Sentado — 158 pax</div><div class="tl-card-desc">Mesas redondas · Música ambiente · Cartões de alimentação especial visíveis · Após todos sentados, promotoras podem sair</div><div class="tl-badge badge-food">Jantar</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">20:30</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Staff Janta</div><div class="tl-card-desc">Check-out promotoras · Bengaleiro</div><div class="tl-badge badge-food">Staff</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">22:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot highlight"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Espetáculo de Magia</div><div class="tl-card-desc">Digestivos: Vinho Porto · Moscatel · Aguardente Velha · Whiskey Novo · Café · Refrigerantes · Águas</div><div class="tl-badge badge-show">Espetáculo</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">23:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Música Ambiente</div><div class="tl-card-desc">DJ continua com música ambiente</div><div class="tl-badge badge-show">Festa</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">23:30</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Fim do Evento</div><div class="tl-badge badge-end">Encerramento</div></div>
+    </div>
+    <div class="timeline-item">
+      <div class="tl-left"><div class="tl-time">00:00</div><div class="tl-line"></div></div>
+      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+      <div class="tl-card"><div class="tl-card-title">Desmontagens</div><div class="tl-card-desc">Desmontagem geral de todo o equipamento</div><div class="tl-badge badge-end">Desmontagem</div></div>
+    </div>
+  </div>
+
+  <!-- EQUIPA -->
+  <div class="tab-content" id="tab-equipa">
+    <div class="role-section">
+
+      <!-- PROMOTORAS -->
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-avatar av-purple">PR</div>
+          <div><div class="role-name">Promotoras</div><div class="role-subtitle">Chegada às 14:30 · Saída após jantar ≈ 20:30</div></div>
+        </div>
+        <div class="role-timeline">
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">14:30</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot orange"></div></div>
+            <div class="rt-content"><div class="rt-label">Chegam e estão prontas</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">15:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot green"></div></div>
+            <div class="rt-content"><div class="rt-label">Check-in de convidados</div><div class="rt-desc">Leitura QR Code na app 3ricket · Entregar cartões de alimentação especial (pedir para colocar à vista no jantar) · Guardar casacos no bengaleiro · Encaminhar para o Backdrop · Encaminhar para Welcome Coffee</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">15:30</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Fotografia de Grupo</div><div class="rt-desc">Encaminhar convidados para a fotografia de grupo</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">16:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Encaminhar para a plateia</div><div class="rt-desc">Sentar convidados para as apresentações do Board</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">17:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Coffee Break</div><div class="rt-desc">Encaminhar para o coffee break e depois voltar a encaminhar para a plateia</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">18:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Q&A — Distribuir microfones</div><div class="rt-desc">Circular pela plateia com 2 microfones de mão durante as perguntas</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">19:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Cocktail + Photobooth IA</div><div class="rt-desc">Encaminhar convidados para o cocktail e para a ativação do Photobooth IA</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">20:15</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Encaminhar para o jantar</div><div class="rt-desc">Sentar nas mesas redondas — podem sair após todos sentados</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">20:30</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot orange"></div></div>
+            <div class="rt-content" style="padding-bottom:0;"><div class="rt-label">Check-out + Bengaleiro</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">22:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot orange"></div></div>
+            <div class="rt-content" style="padding-bottom:0;"><div class="rt-label">Check-out final · Bengaleiro</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIOMEIOS -->
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-avatar av-teal">AU</div>
+          <div><div class="role-name">Audiomeios</div><div class="role-subtitle">Chegada às 07:00</div></div>
+        </div>
+        <div class="role-timeline">
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">07:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Montagens</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">12:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Testes Cliente + Testes Mágico</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">14:30</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot orange"></div></div>
+            <div class="rt-content"><div class="rt-label">LED Wall: Imagem genérica</div><div class="rt-desc">Ter tudo pronto · Microfones: 2 auriculares + 3 de mão. Durante Q&A: João com auricular, 1 mic mão fila frente, 2 mics com promotoras</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">16:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Apresentações do cliente</div><div class="rt-desc">Colocar apresentações fornecidas pelo cliente no LED Wall</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">17:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">LED Wall: Imagem Coffee Break</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">17:30</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Apresentações do cliente</div><div class="rt-desc">Colocar apresentações fornecidas pelo cliente no LED Wall</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">18:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">LED Wall: Imagem Q&A</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">19:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">LED Wall: Imagem genérica</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">20:15</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Colocar música ambiente</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">23:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content" style="padding-bottom:0;"><div class="rt-label">Música ambiente · Fim do evento</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEOGRAFO -->
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-avatar av-amber">VG</div>
+          <div><div class="role-name">Videógrafo</div><div class="role-subtitle">Chegada às 14:30 · Cobertura ao longo do dia</div></div>
+        </div>
+        <div class="role-timeline">
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">14:30</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot orange"></div></div>
+            <div class="rt-content"><div class="rt-label">Chegar e ter tudo pronto</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">15:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot green"></div></div>
+            <div class="rt-content"><div class="rt-label">Cobertura da chegada dos convidados</div><div class="rt-desc">Exterior e entrada · Estufa Fria · Check-in · Convidados a chegar · Fotos no Photowall · Welcome Coffee</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">15:30</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot green"></div></div>
+            <div class="rt-content"><div class="rt-label">Fotografia de Grupo</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">16:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Cobertura das apresentações</div><div class="rt-desc">Filmagem das apresentações do Board, coffee break e momentos de Q&A</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">19:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot green"></div></div>
+            <div class="rt-content"><div class="rt-label">Cobertura do Cocktail e Jantar</div><div class="rt-desc">Photobooth IA · DJ · Cocktail · Mesas de jantar · Decoração · Branding</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">22:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot orange"></div></div>
+            <div class="rt-content" style="padding-bottom:0;"><div class="rt-label">Cobertura do Espetáculo de Magia</div><div class="rt-desc">Espetáculo de magia e final de noite com música ambiente</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHOTOBOOTH + DJ -->
+      <div class="role-card">
+        <div class="role-header">
+          <div class="role-avatar av-blue">PB</div>
+          <div><div class="role-name">Photobooth IA + DJ</div><div class="role-subtitle">Montagem às 10:00</div></div>
+        </div>
+        <div class="role-timeline">
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">10:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Montagens e testes</div><div class="rt-desc">Montagem e testes do Photobooth IA e DJ</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">12:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Testes Mágico</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">19:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot green"></div></div>
+            <div class="rt-content"><div class="rt-label">Ativação Photobooth IA + Música ambiente</div><div class="rt-desc">Ativação durante o Cocktail</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">20:15</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content"><div class="rt-label">Staff janta · Música ambiente</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">22:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot orange"></div></div>
+            <div class="rt-content"><div class="rt-label">Espetáculo de Magia</div></div>
+          </div>
+          <div class="rt-item">
+            <div class="rt-left"><div class="rt-time">23:00</div><div class="rt-line"></div></div>
+            <div class="tl-dot-wrap" style="padding-top:3px;"><div class="rt-dot"></div></div>
+            <div class="rt-content" style="padding-bottom:0;"><div class="rt-label">Música ambiente até ao fim</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="tab-content" id="tab-info">
+    <div class="info-section">
+      <div class="info-card">
+        <div class="info-card-title">Evento</div>
+        <div class="info-row"><span class="info-key">Nome</span><span class="info-val">Let's Make it Together</span></div>
+        <div class="info-row"><span class="info-key">Cliente</span><span class="info-val">Logicalis</span></div>
+        <div class="info-row"><span class="info-key">Data</span><span class="info-val">Sexta, 20 Mar 2026</span></div>
+        <div class="info-row"><span class="info-key">Local</span><span class="info-val">Casa do Marquês, Lisboa</span></div>
+        <div class="info-row"><span class="info-key">Horário</span><span class="info-val">07:00 — 00:00</span></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Convidados</div>
+        <div class="info-row"><span class="info-key">Check-in</span><span class="info-val">160 pessoas</span></div>
+        <div class="info-row"><span class="info-key">Cocktail</span><span class="info-val">158 pax</span></div>
+        <div class="info-row"><span class="info-key">Jantar</span><span class="info-val">158 pax · mesas redondas</span></div>
+        <div class="info-row"><span class="info-key">Sistema</span><span class="info-val">App 3ricket (QR Code)</span></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Oradores do Board</div>
+        <div class="info-row"><span class="info-key">João Martins</span><span class="info-val">CEO · mic auricular</span></div>
+        <div class="info-row"><span class="info-key">Hugo Ferreira</span><span class="info-val">Finance Director</span></div>
+        <div class="info-row"><span class="info-key">Pedro Dias</span><span class="info-val">CSO</span></div>
+        <div class="info-row"><span class="info-key">Miguel Borges</span><span class="info-val">COO</span></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Microfones</div>
+        <div class="info-row"><span class="info-key">Auriculares</span><span class="info-val">2 pedidos</span></div>
+        <div class="info-row"><span class="info-key">Mão</span><span class="info-val">3 pedidos</span></div>
+        <div class="info-row"><span class="info-key">Durante Q&A</span><span class="info-val">João: auricular · Frente: 1 mão · Promotoras: 2 mão</span></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Digestivos — 22:00</div>
+        <div class="info-row"><span class="info-key">Vinhos</span><span class="info-val">Porto · Moscatel</span></div>
+        <div class="info-row"><span class="info-key">Spirits</span><span class="info-val">Aguardente Velha · Whiskey Novo</span></div>
+        <div class="info-row"><span class="info-key">Outros</span><span class="info-val">Café · Refrigerantes · Águas</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+  <!-- MAPA -->
+  <div class="tab-content" id="tab-mapa">
+    <div style="padding:14px 16px 8px;">
+
+      <!-- Zone buttons FIRST -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; margin-bottom:8px;">
+        <button onclick="highlightZone('entrada')"    id="btn-entrada"    style="background:#ede9fb; border:2px solid transparent; border-radius:10px; padding:10px 6px; font-size:11px; font-weight:700; color:#5b35d5; cursor:pointer;">ENTRADA</button>
+        <button onclick="highlightZone('photobooth')" id="btn-photobooth" style="background:#e4f5ee; border:2px solid transparent; border-radius:10px; padding:10px 6px; font-size:11px; font-weight:700; color:#1e7d52; cursor:pointer;">PHOTOBOOTH</button>
+        <button onclick="highlightZone('palco')"      id="btn-palco"      style="background:#fef3e2; border:2px solid transparent; border-radius:10px; padding:10px 6px; font-size:11px; font-weight:700; color:#b85f0a; cursor:pointer;">PALCO</button>
+        <button onclick="highlightZone('magico')"     id="btn-magico"     style="background:#fde8e8; border:2px solid transparent; border-radius:10px; padding:10px 6px; font-size:11px; font-weight:700; color:#b02020; cursor:pointer;">PALCO MÁGICO</button>
+        <button onclick="highlightZone('regie')"      id="btn-regie"      style="background:#e6f0fb; border:2px solid transparent; border-radius:10px; padding:10px 6px; font-size:11px; font-weight:700; color:#1a5fa8; cursor:pointer;">REGIE</button>
+        <button onclick="highlightZone('bengaleiro')" id="btn-bengaleiro" style="background:#f0f0f0; border:2px solid transparent; border-radius:10px; padding:10px 6px; font-size:11px; font-weight:700; color:#555; cursor:pointer;">BENGALEIRO</button>
+      </div>
+
+      <!-- Zone description -->
+      <div id="zone-desc" style="display:none; border-radius:10px; padding:11px 14px; margin-bottom:8px; font-size:13px; font-weight:600;"></div>
+
+      <!-- Map image BELOW -->
+      <div style="border-radius:14px; border:1px solid #e8e5e0; overflow:hidden; background:#fff;">
+        <div style="overflow:auto; -webkit-overflow-scrolling:touch;">
+          <div style="position:relative; display:inline-block; width:100%;">
+            <img id="planta-img" src="planta.jpg"
+              alt="Planta da sala"
+              style="width:100%; display:block; height:auto;">
+            <div id="hl-entrada"    class="zone-hl" style="left:47%; top:72%; width:16%; height:20%; background:rgba(91,53,213,0.25); border:2px solid #5b35d5;"></div>
+            <div id="hl-photobooth" class="zone-hl" style="left:55%; top:8%;  width:14%; height:22%; background:rgba(30,125,82,0.25); border:2px solid #1e7d52;"></div>
+            <div id="hl-palco"      class="zone-hl" style="left:0%;  top:8%;  width:12%; height:55%; background:rgba(184,95,10,0.25); border:2px solid #b85f0a;"></div>
+            <div id="hl-magico"     class="zone-hl" style="left:28%; top:8%;  width:12%; height:18%; background:rgba(176,32,32,0.25); border:2px solid #b02020;"></div>
+            <div id="hl-regie"      class="zone-hl" style="left:14%; top:8%;  width:12%; height:18%; background:rgba(26,95,168,0.25); border:2px solid #1a5fa8;"></div>
+            <div id="hl-bengaleiro" class="zone-hl" style="left:68%; top:8%;  width:16%; height:22%; background:rgba(85,85,85,0.2);  border:2px solid #888;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legenda -->
+      <div style="background:#fff; border-radius:14px; border:1px solid #e8e5e0; padding:14px 16px; margin-top:10px;">
+        <div style="font-size:11px; font-weight:700; color:#bbb; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px;">Legenda</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+            <div style="width:12px;height:12px;border-radius:50%;border:2px solid #e07d20;flex-shrink:0;"></div>
+            <span style="color:#1a1a2e;font-weight:600;">7 mesas de 10 pax</span><span style="color:#888;margin-left:auto;">= 70 pax</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+            <div style="width:12px;height:12px;border-radius:50%;border:2px solid #1a4adc;flex-shrink:0;"></div>
+            <span style="color:#1a1a2e;font-weight:600;">10 mesas de 9 pax</span><span style="color:#888;margin-left:auto;">= 90 pax</span>
+          </div>
+          <div style="border-top:1px solid #f0ede8;padding-top:8px;display:flex;justify-content:space-between;font-size:14px;">
+            <span style="color:#888;">Total</span><span style="font-weight:700;color:#1a4adc;">160 pax</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;border-top:1px solid #f0ede8;padding-top:8px;">
+            <div style="width:12px;height:12px;background:#2e9e68;border-radius:2px;flex-shrink:0;"></div>
+            <span style="color:#1a1a2e;font-weight:600;">Bar</span><span style="color:#888;margin-left:auto;">Welcome · Coffee break · Bar aberto</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+<script>
+function switchTab(tab, el) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  el.classList.add('active');
+}
+var schedule = [
+  {h:7,m:0,label:'Montagens Audiomeios'},
+  {h:9,m:30,label:'Chegada The Stage'},
+  {h:10,m:0,label:'Montagens e Testes Photobooth & DJ'},
+  {h:12,m:0,label:'Testes Cliente + Mágico'},
+  {h:14,m:30,label:'Tudo Pronto — Equipa no Local'},
+  {h:15,m:0,label:'Chegada de Convidados'},
+  {h:15,m:30,label:'Welcome Coffee'},
+  {h:16,m:0,label:'Apresentação Board · João & Hugo'},
+  {h:17,m:0,label:'Coffee Break'},
+  {h:17,m:30,label:'Apresentação Board · Pedro & Miguel'},
+  {h:18,m:0,label:'Q&A + Fecho da Sessão'},
+  {h:19,m:0,label:'Cocktail + Photobooth IA'},
+  {h:20,m:15,label:'Jantar Sentado'},
+  {h:20,m:30,label:'Staff Janta'},
+  {h:22,m:0,label:'Espetáculo de Magia'},
+  {h:23,m:0,label:'Música Ambiente'},
+  {h:23,m:30,label:'Fim do Evento'},
+  {h:0,m:0,label:'Desmontagens'},
+];
+function updateLive() {
+  var now = new Date(), h = now.getHours(), m = now.getMinutes();
+  document.getElementById('live-clock').textContent = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+  var nowMin = (h===0?24:h)*60+m, current = null;
+  for (var i = schedule.length-1; i >= 0; i--) {
+    var sh = schedule[i].h===0?24:schedule[i].h;
+    if (nowMin >= sh*60+schedule[i].m) { current=schedule[i]; break; }
+  }
+  document.getElementById('live-text').textContent = current ? 'Agora: '+current.label : 'Evento começa às 07:00';
+}
+updateLive(); setInterval(updateLive, 30000);
+
+var zoneInfo = {
+  entrada:    { label:'ENTRADA', color:'#5b35d5', bg:'#ede9fb', desc:'Check-in via QR Code · Bengaleiro · Fotos no Backdrop' },
+  photobooth: { label:'PHOTOBOOTH', color:'#1e7d52', bg:'#e4f5ee', desc:'Ativação Photobooth IA durante o Cocktail (19:00)' },
+  palco:      { label:'PALCO 8x2', color:'#b85f0a', bg:'#fef3e2', desc:'Apresentações do Board (16:00, 17:30) · Q&A (18:00)' },
+  magico:     { label:'PALCO MÁGICO 4x3', color:'#b02020', bg:'#fde8e8', desc:'Espetáculo de Magia às 22:00' },
+  regie:      { label:'REGIE', color:'#1a5fa8', bg:'#e6f0fb', desc:'Audiomeios · Controlo técnico' },
+  bengaleiro: { label:'BENGALEIRO + CHECK-IN', color:'#555', bg:'#f0f0f0', desc:'Guardar casacos · Staff' },
+};
+var activeZone = null;
+function highlightZone(zone) {
+  // Reset all
+  document.querySelectorAll('.zone-hl').forEach(function(el){ el.style.display='none'; });
+  document.querySelectorAll('[id^="btn-"]').forEach(function(el){ el.style.borderColor='transparent'; });
+  var desc = document.getElementById('zone-desc');
+  if (activeZone === zone) { activeZone = null; desc.style.display='none'; return; }
+  activeZone = zone;
+  var hl = document.getElementById('hl-' + zone);
+  var btn = document.getElementById('btn-' + zone);
+  var info = zoneInfo[zone];
+  if (hl) hl.style.display = 'block';
+  if (btn) btn.style.borderColor = info.color;
+  desc.style.display = 'block';
+  desc.style.background = info.bg;
+  desc.style.color = info.color;
+  desc.innerHTML = '<strong>' + info.label + '</strong> — ' + info.desc;
+  // Scroll map to show the highlighted area
+  var mapScroll = document.getElementById('map-scroll');
+  var img = document.getElementById('planta-img');
+  if (hl && mapScroll && img) {
+    var hlLeft = parseFloat(hl.style.left) / 100 * img.offsetWidth;
+    mapScroll.scrollLeft = Math.max(0, hlLeft - 60);
+  }
+}
+
+</script>
+</body>
+</html>
